@@ -3,6 +3,8 @@ package cmd
 import (
 	"fmt"
 
+	"IdentityServer/route"
+
 	"github.com/kataras/iris/v12"
 	"github.com/spf13/cobra"
 )
@@ -16,10 +18,8 @@ var runserverCmd = &cobra.Command{
 
 	Run: func(cmd *cobra.Command, args []string) {
 		app := iris.New()
-		app.Get("/", func(c iris.Context) {
 
-			c.JSON(iris.Map{"lanagege": "golang "})
-		})
+		app.PartyFunc("/", route.Route)
 
 		app.Listen(fmt.Sprintf("%s:%s", host, port))
 	},

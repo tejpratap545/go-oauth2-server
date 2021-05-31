@@ -2,3 +2,4 @@
 .vscode
 go.sum
 .iris.yml
+__debug_bin
