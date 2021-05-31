@@ -17,6 +17,7 @@ go get IdentityServer
 You will need to have [Iris CLI](https://github.com/kataras/iris-cli) installed.
 
 Execute the following command:
+
 ```sh
 iris-cli new basic --replace=iris-contrib/basic-template=your_username/repo
 ```
