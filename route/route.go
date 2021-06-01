@@ -6,4 +6,10 @@ import (
 
 func Route(route iris.Party) {
 
+	route.HandleDir("/static", iris.Dir("./static"))
+	route.Get("/home", func(ctx iris.Context) {
+		ctx.ViewData("title", "Home page")
+		ctx.View("home.html")
+	})
+
 }

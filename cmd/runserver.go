@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"IdentityServer/route"
 
 	"github.com/kataras/iris/v12"
@@ -19,9 +17,13 @@ var runserverCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		app := iris.New()
 
+		app.RegisterView(iris.HTML("./web", ".html").Layout("layout.html").Reload(true))
+
 		app.PartyFunc("/", route.Route)
 
-		app.Listen(fmt.Sprintf("%s:%s", host, port))
+		// app.Listen(iris.AutoTLS(fmt.Sprintf("%s:%s", host, port), "localhost", "tejpratapsingh545@gmail.com"))
+		addr := ":8000"
+		app.Run(iris.TLS(addr, "./certificates/localhost.crt", "./certificates/localhost.key"))
 	},
 }
 
@@ -29,6 +31,6 @@ func init() {
 	rootCmd.AddCommand(runserverCmd)
 
 	runserverCmd.Flags().StringVarP(&port, "post", "P", "8000", "enter port number")
-	runserverCmd.Flags().StringVarP(&host, "host", "H", "0.0.0.0", "enter host ")
+	runserverCmd.Flags().StringVarP(&host, "host", "H", "localhost", "enter host ")
 
 }
