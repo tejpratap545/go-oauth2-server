@@ -77,11 +77,15 @@ var createClientCmd = &cobra.Command{
 		}
 
 		db := config.DB()
-		result, err := client.Create(db)
+		_, err = client.Create(db)
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Println(result)
+
+		fmt.Println("Client is successfully created")
+		fmt.Println("Client ID or Key is : ", client.Key)
+		fmt.Println("Client Secert is : ", client.Secret)
+		fmt.Println("Redirect url or callback url after the client login is : ", client.RedirectURI)
 
 	},
 }

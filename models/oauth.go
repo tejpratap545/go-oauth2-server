@@ -32,12 +32,12 @@ func RandomBase16String(l int) string {
 	return str[:l]
 }
 
-func (client OauthClient) Create(db *mongo.Database) (*mongo.InsertOneResult, error) {
+func (client *OauthClient) Create(db *mongo.Database) (*mongo.InsertOneResult, error) {
 	oauthClientCollection := db.Collection("oauthclient")
 	client.CreatedAt = time.Now()
 	client.IsActive = true
-	client.Key = RandomBase16String(10)
-	client.Secret = RandomBase16String(30)
+	client.Key = RandomBase16String(16)
+	client.Secret = RandomBase16String(32)
 	ctx := context.Background()
 
 	result, err := oauthClientCollection.InsertOne(ctx, client)
