@@ -6,6 +6,7 @@ import (
 	"context"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -51,6 +52,22 @@ func UserCollection(db *mongo.Database) *mongo.Collection {
 	return db.Collection("User")
 }
 
+func GetUserByEmailOrContactNumber(db *mongo.Database, username string, c context.Context) (*User, error) {
+	var user User
+	userCollection := UserCollection(db)
+
+	query := bson.M{
+		"$or": bson.A{
+			bson.M{"email": username},
+			bson.M{"contactNumber": username},
+		},
+	}
+	if err := userCollection.FindOne(c, query).Decode(&user); err != nil {
+		return nil, err
+	}
+	return &user, nil
+
+}
 func (user *User) Create(db *mongo.Database) (*mongo.InsertOneResult, error) {
 	user.Id = primitive.NewObjectIDFromTimestamp(time.Now())
 

@@ -9,13 +9,11 @@ import (
 func Route(route iris.Party) {
 
 	route.HandleDir("/static", iris.Dir("./static"))
-	route.Get("/home", func(ctx iris.Context) {
-		ctx.ViewData("title", "Home page")
-		ctx.View("home.html")
-	})
 
 	v1 := route.Party("/v1")
+	oauth := v1.Party("/o/oauth")
+	oauth.Get("/authorize", controller.Authorize)
+	oauth.Post("/siginin", controller.SiginInHandler)
 
-	v1.Post("/o/oauth/tokens", controller.OauthTokensHandler)
-
+	oauth.Post("/tokens", controller.OauthTokensHandler)
 }

@@ -6,3 +6,7 @@ func InvalidGrantResponse(ctx iris.Context) {
 	ctx.StopWithJSON(400, iris.Map{"msg": "Invalid Grant "})
 
 }
+
+func ResponseWithToken(ctx iris.Context) {
+
+}

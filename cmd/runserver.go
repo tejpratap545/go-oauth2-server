@@ -1,12 +1,15 @@
 package cmd
 
 import (
+	"IdentityServer/config"
 	"IdentityServer/route"
 	"fmt"
 
 	"IdentityServer/middleware"
 
+	"github.com/gorilla/securecookie"
 	"github.com/kataras/iris/v12"
+	"github.com/kataras/iris/v12/sessions"
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +21,22 @@ var runserverCmd = &cobra.Command{
 	Short: "A brief description of your command",
 
 	Run: func(cmd *cobra.Command, args []string) {
-		app := iris.New()
+
+		hashKey := securecookie.GenerateRandomKey(64)
+		blockKey := securecookie.GenerateRandomKey(32)
+		s := securecookie.New(hashKey, blockKey)
+		sess := sessions.New(sessions.Config{
+			Cookie:          "_session_id",
+			Expires:         0,
+			AllowReclaim:    true,
+			CookieSecureTLS: true,
+			Encoding:        s,
+		})
+
+		app := iris.Default()
+		app.Use(sess.Handler())
+
+		sess.UseDatabase(config.Redis())
 
 		app.Use(middleware.AddMongoToContext)
 

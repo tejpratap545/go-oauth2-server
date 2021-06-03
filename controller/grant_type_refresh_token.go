@@ -16,7 +16,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type request struct {
+type RefreshTokenBody struct {
 	GrantType    string `json:"grant_type,omitempty" url:"grant_type" xml:"grant_type" form:"grant_type"`
 	RefreshToken string `json:"refresh_token,omitempty" url:"refresh_token" xml:"refresh_token" form:"refresh_token"`
 	ClientId     string `json:"client_id,omitempty" url:"client_id" xml:"client_id" form:"client_id"`
@@ -24,9 +24,9 @@ type request struct {
 }
 
 func RefreshTokenGrant(ctx iris.Context) {
-	var request request
+	var body RefreshTokenBody
 
-	if err := ctx.ReadBody(&request); err != nil {
+	if err := ctx.ReadBody(&body); err != nil {
 		utils.InvalidGrantResponse(ctx)
 		return
 	}
@@ -36,15 +36,15 @@ func RefreshTokenGrant(ctx iris.Context) {
 	c, _ := context.WithTimeout(ctx.Request().Context(), 10*time.Second)
 	var client models.OauthClient
 	clientQuery := bson.M{
-		"key":    request.ClientId,
-		"secret": request.ClientSecert}
+		"key":    body.ClientId,
+		"secret": body.ClientSecert}
 
 	if err := clientCollection.FindOne(c, clientQuery).Decode(&client); err != nil {
 		utils.InvalidGrantResponse(ctx)
 		return
 	}
 
-	claims, err := utils.DecodeJwt(request.RefreshToken)
+	claims, err := utils.DecodeJwt(body.RefreshToken)
 	if (claims["TokenType"] != "refresh_token" || claims["sub"] != client.Id.Hex()) && err != nil {
 		utils.InvalidGrantResponse(ctx)
 		return

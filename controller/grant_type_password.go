@@ -15,7 +15,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type Request struct {
+type PasswordBody struct {
 	GrantType    string `json:"grant_type,omitempty" url:"grant_type" xml:"grant_type" form:"grant_type"`
 	ClientId     string `json:"client_id,omitempty" url:"client_id" xml:"client_id" form:"client_id"`
 	ClientSecert string `json:"client_secert,omitempty" url:"client_secert" xml:"client_secert" form:"client_secert"`
@@ -26,41 +26,36 @@ type Request struct {
 
 func PasswordGrant(ctx iris.Context) {
 
-	var request Request
+	var body PasswordBody
 
-	if err := ctx.ReadBody(&request); err != nil {
+	if err := ctx.ReadBody(&body); err != nil {
 		utils.InvalidGrantResponse(ctx)
 		return
 	}
+	c, _ := context.WithTimeout(ctx.Request().Context(), 10*time.Second)
 
 	db := ctx.Values().Get("mongoDB").(*mongo.Database)
+	defer db.Client().Disconnect(c)
+
 	clientCollection := models.OauthClientCollection(db)
-	c, _ := context.WithTimeout(ctx.Request().Context(), 10*time.Second)
+
 	var client models.OauthClient
 	clientQuery := bson.M{
-		"key":    request.ClientId,
-		"secret": request.ClientSecert}
+		"key":    body.ClientId,
+		"secret": body.ClientSecert}
 
 	if err := clientCollection.FindOne(c, clientQuery).Decode(&client); err != nil {
 		utils.InvalidGrantResponse(ctx)
 		return
 	}
 
-	var user models.User
-	userCollection := models.UserCollection(db)
-
-	query := bson.M{
-		"$or": bson.A{
-			bson.M{"email": request.Username},
-			bson.M{"contactNumber": request.Username},
-		},
-	}
-	if err := userCollection.FindOne(c, query).Decode(&user); err != nil {
+	user, err := models.GetUserByEmailOrContactNumber(db, body.Username, c)
+	if err != nil {
 		utils.InvalidGrantResponse(ctx)
 		return
 	}
 
-	if err := utils.VerifyPassword(user.Password, request.Password); err != nil {
+	if err := utils.VerifyPassword(user.Password, body.Password); err != nil {
 		utils.InvalidGrantResponse(ctx)
 		return
 	}

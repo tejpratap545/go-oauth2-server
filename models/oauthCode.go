@@ -27,7 +27,6 @@ func OauthAuthorizationCodeCollection(db *mongo.Database) *mongo.Collection {
 }
 
 func (code *OauthAuthorizationCode) Create(ctx context.Context, db *mongo.Database) (*mongo.InsertOneResult, error) {
-	code.CreatedAt = time.Now()
 	oauthAuthorizationCodeCollection := OauthAuthorizationCodeCollection(db)
 	return oauthAuthorizationCodeCollection.InsertOne(ctx, code)
 }
