@@ -37,9 +37,9 @@ func (user *User) AddTosession(ctx iris.Context) {
 		return
 	}
 
-	users := session.Get("users").([]User)
-	users = append(users, *user)
-	session.Set("users", users)
-	session.Set("currectUser", user)
+	// users := session.Get("users").([]User)
+	// users = append(users, *user)
+	// session.Set("users", users)
+	// session.Set("currectUser", user)
 
 }

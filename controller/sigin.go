@@ -81,7 +81,7 @@ func SiginInHandler(ctx iris.Context) {
 			Id:    user.Id,
 			Email: user.Email,
 		}
-		go sessionUser.AddTosession(ctx)
+		sessionUser.AddTosession(ctx)
 
 		if oauthData.ResponseType == "token" {
 			ResponseWithToken(ctx, client, oauthData, *sessionUser, db, c)

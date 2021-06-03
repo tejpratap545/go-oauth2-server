@@ -63,7 +63,7 @@ func ResponseWithToken(ctx iris.Context, client models.OauthClient, body Authori
 }
 
 func ResponseWithCode(ctx iris.Context, client models.OauthClient, body AuthorizeBody, user service.User, db *mongo.Database, c context.Context) {
-	userAgent := ctx.GetHeader("User-Agent")
+	userAgent := strings.Split(ctx.GetHeader("User-Agent"), "/")[0]
 	currentTime := time.Now()
 	code := &models.OauthAuthorizationCode{
 		Id:          primitive.NewObjectIDFromTimestamp(currentTime),
@@ -73,9 +73,10 @@ func ResponseWithCode(ctx iris.Context, client models.OauthClient, body Authoriz
 		UserAgent:   userAgent,
 		Ip:          ctx.GetHeader("X-Forwarded-For"),
 		RedirectURI: body.RedirectUrl,
+		ExpiresAt:   time.Now().Add(5 * time.Minute),
 	}
 
-	go code.Create(c, db)
+	code.Create(c, db)
 
 	redirectUrl, err := url.Parse(body.RedirectUrl)
 	if err != nil {

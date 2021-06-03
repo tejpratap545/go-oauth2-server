@@ -26,6 +26,10 @@ func OauthAuthorizationCodeCollection(db *mongo.Database) *mongo.Collection {
 	return db.Collection("OauthAuthorizationCode")
 }
 
+func (code *OauthAuthorizationCode) IsValid(ctx context.Context, db *mongo.Database) bool {
+	return code.ExpiresAt.Unix() > time.Now().Unix()
+}
+
 func (code *OauthAuthorizationCode) Create(ctx context.Context, db *mongo.Database) (*mongo.InsertOneResult, error) {
 	oauthAuthorizationCodeCollection := OauthAuthorizationCodeCollection(db)
 	return oauthAuthorizationCodeCollection.InsertOne(ctx, code)
