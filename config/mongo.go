@@ -15,7 +15,7 @@ func DB() *mongo.Database {
 	if err != nil {
 		log.Fatal(err)
 	}
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), 5*time.Minute)
 	err = client.Connect(ctx)
 	if err != nil {
 		log.Fatal(err)

@@ -99,6 +99,36 @@ var createUserCmd = &cobra.Command{
 	Use:   "user",
 	Short: "Create the oauth2 dummy user",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("create called")
+
+		if user.Email == "" {
+			fmt.Print("Enter user email: ")
+			reader := bufio.NewReader(os.Stdin)
+			user.Email, _ = reader.ReadString('\n')
+			user.Email = user.Email[:len(user.Email)-1]
+
+		}
+
+		if user.ContactNumber == "" {
+			fmt.Print("Enter user ContactNumber: ")
+			reader := bufio.NewReader(os.Stdin)
+			user.ContactNumber, _ = reader.ReadString('\n')
+			user.ContactNumber = user.ContactNumber[:len(user.ContactNumber)-1]
+
+		}
+
+		if user.Password == "" {
+			fmt.Print("Enter user Password: ")
+			reader := bufio.NewReader(os.Stdin)
+			user.Password, _ = reader.ReadString('\n')
+			user.Password = user.Password[:len(user.Password)-1]
+
+		}
+
+		if _, err := user.Create(config.DB()); err != nil {
+			log.Fatal("Can Not create user")
+		}
+
+		log.Println("SuccessFully Create User")
+
 	},
 }

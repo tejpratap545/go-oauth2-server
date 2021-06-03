@@ -11,9 +11,9 @@ import (
 type OauthAccessToken struct {
 	Id        primitive.ObjectID `json:"id,omitempty" bson:"_id" xml:"id" form:"id"`
 	ClientID  primitive.ObjectID `json:"clientID,omitempty" bson:"clientID" xml:"clientID" form:"clientID"`
-	Client    OauthClient        `json:"client,omitempty" bson:"client" xml:"client" form:"client"`
+	Client    *OauthClient       `json:"client,omitempty" bson:"client" xml:"client" form:"client"`
 	UserID    primitive.ObjectID `json:"userID,omitempty" bson:"userID" xml:"userID" form:"userID"`
-	User      User               `json:"user,omitempty" bson:"user" xml:"user" form:"user"`
+	User      *User              `json:"user,omitempty" bson:"user" xml:"user" form:"user"`
 	CreatedAt time.Time          `json:"createdAt,omitempty" bson:"createdAt" xml:"createdAt" form:"createdAt"`
 	ExpiresAt time.Time          `json:"expiresAt,omitempty" bson:"expiresAt" xml:"expiresAt" form:"expiresAt"`
 	IsRevoked bool               `json:"isRevoked,omitempty" bson:"isRevoked" xml:"isRevoked" form:"isRevoked"`
@@ -28,11 +28,15 @@ func OAuthAccessTokenCollection(db *mongo.Database) *mongo.Collection {
 
 func (accessToken *OauthAccessToken) Create(ctx context.Context, db *mongo.Database) (*mongo.InsertOneResult, error) {
 	oAuthAccessTokenCollection := OAuthAccessTokenCollection(db)
-	accessToken.Id = primitive.NewObjectID()
 
-	accessToken.CreatedAt = time.Now()
 	accessToken.IsRevoked = false
+	accessToken.Client = nil
+	accessToken.User = nil
 
 	return oAuthAccessTokenCollection.InsertOne(ctx, accessToken)
 
+}
+
+func (accessToken *OauthAccessToken) IsValid() bool {
+	return !accessToken.IsRevoked && time.Now().Unix() < accessToken.ExpiresAt.Unix()
 }

@@ -1,25 +1,27 @@
 package models
 
 import (
+	"IdentityServer/config"
+	"IdentityServer/utils"
+	"context"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type Address struct {
-	Id       primitive.ObjectID `json:"id,omitempty" bson:"_id" xml:"id" form:"id"`
-	Address1 string             `json:"address1,omitempty" bson:"address1" xml:"address1" form:"address1"`
-	Address2 string             `json:"address2,omitempty" bson:"address2" xml:"address2" form:"address2"`
-	City     string             `json:"city,omitempty" bson:"city" xml:"city" form:"city"`
-	State    string             `json:"state,omitempty" bson:"state" xml:"state" form:"state"`
-	Country  string             `json:"country,omitempty" bson:"country" xml:"country" form:"country"`
+	Address1 string `json:"address1,omitempty" bson:"address1" xml:"address1" form:"address1"`
+	Address2 string `json:"address2,omitempty" bson:"address2" xml:"address2" form:"address2"`
+	City     string `json:"city,omitempty" bson:"city" xml:"city" form:"city"`
+	State    string `json:"state,omitempty" bson:"state" xml:"state" form:"state"`
+	Country  string `json:"country,omitempty" bson:"country" xml:"country" form:"country"`
 }
 type CreditCard struct {
-	Id         primitive.ObjectID `json:"id,omitempty" bson:"_id" xml:"id" form:"id"`
-	CardNumner string             `json:"cardNumner,omitempty" bson:"cardNumner" xml:"cardNumner" form:"cardNumner"`
-	ExpiryDate time.Time          `json:"expiryDate,omitempty" bson:"expiryDate" xml:"expiryDate" form:"expiryDate"`
-	CreatedAt  time.Time          `json:"createdAt,omitempty" bson:"createdAt" xml:"createdAt" form:"createdAt"`
-	IsDefault  bool               `json:"isDefault,omitempty" bson:"isDefault" xml:"isDefault" form:"isDefault"`
+	CardNumner string    `json:"cardNumner,omitempty" bson:"cardNumner" xml:"cardNumner" form:"cardNumner"`
+	ExpiryDate time.Time `json:"expiryDate,omitempty" bson:"expiryDate" xml:"expiryDate" form:"expiryDate"`
+	CreatedAt  time.Time `json:"createdAt,omitempty" bson:"createdAt" xml:"createdAt" form:"createdAt"`
+	IsDefault  bool      `json:"isDefault,omitempty" bson:"isDefault" xml:"isDefault" form:"isDefault"`
 }
 
 type TwoFactorApplcation struct {
@@ -43,4 +45,18 @@ type User struct {
 	Address       []Address          `json:"address,omitempty" bson:"address" xml:"address" form:"address"`
 	Card          []CreditCard       `json:"card,omitempty" bson:"card" xml:"card" form:"card"`
 	TwoFector     TwoFector          `json:"twoFector,omitempty" bson:"twoFector" xml:"twoFector" form:"twoFector"`
+}
+
+func UserCollection(db *mongo.Database) *mongo.Collection {
+	return db.Collection("User")
+}
+
+func (user *User) Create(db *mongo.Database) (*mongo.InsertOneResult, error) {
+	user.Id = primitive.NewObjectIDFromTimestamp(time.Now())
+
+	passwordByte, _ := utils.HashPassword(user.Password)
+	user.Password = string(passwordByte)
+	userCollection := UserCollection(config.DB())
+	return userCollection.InsertOne(context.Background(), user)
+
 }

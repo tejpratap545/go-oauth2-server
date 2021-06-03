@@ -2,6 +2,9 @@ package cmd
 
 import (
 	"IdentityServer/route"
+	"fmt"
+
+	"IdentityServer/middleware"
 
 	"github.com/kataras/iris/v12"
 	"github.com/spf13/cobra"
@@ -17,12 +20,14 @@ var runserverCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		app := iris.New()
 
+		app.Use(middleware.AddMongoToContext)
+
 		app.RegisterView(iris.HTML("./web", ".html").Layout("layout.html").Reload(true))
 
 		app.PartyFunc("/", route.Route)
 
 		// app.Listen(iris.AutoTLS(fmt.Sprintf("%s:%s", host, port), "localhost", "tejpratapsingh545@gmail.com"))
-		addr := ":8000"
+		addr := fmt.Sprintf("%s:%s", host, port)
 		app.Run(iris.TLS(addr, "./certificates/localhost.crt", "./certificates/localhost.key"))
 	},
 }
