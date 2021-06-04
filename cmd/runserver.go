@@ -22,9 +22,9 @@ var runserverCmd = &cobra.Command{
 
 	Run: func(cmd *cobra.Command, args []string) {
 
-		hashKey := securecookie.GenerateRandomKey(64)
-		blockKey := securecookie.GenerateRandomKey(32)
-		s := securecookie.New(hashKey, blockKey)
+		hashKey := []byte("EexT19JCfLJt7YjfqVG0HV5XEH79bxWtYAQfz9VRxHbo5nlTEEEDPmQqiFJ1ojtJusDp30N9ygy3tW0fdUL_9A==")
+		blockKey := []byte("7vCuMSn0Tue2wu-Z-Llh7lyfFObXWEzqgzMwLyHeA2w=")
+		s := securecookie.New(hashKey[:24], blockKey[:16])
 		sess := sessions.New(sessions.Config{
 			Cookie:          "_session_id",
 			Expires:         0,

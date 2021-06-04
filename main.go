@@ -19,4 +19,5 @@ import "IdentityServer/cmd"
 
 func main() {
 	cmd.Execute()
+
 }
