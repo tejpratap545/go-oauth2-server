@@ -7,7 +7,6 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gorilla/securecookie v1.1.1
 	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
-	github.com/kataras/iris v0.0.2
 	github.com/kataras/iris/v12 v12.2.0-alpha2.0.20210528161351-32291fa59eff
 	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/spf13/cobra v1.1.3
